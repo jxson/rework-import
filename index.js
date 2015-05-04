@@ -117,6 +117,7 @@ function run(style, opts) {
 
     var rules = style.rules || [];
     var ret = [];
+    var once = [];
 
     rules.forEach(function (rule) {
         if (rule.type !== 'import') {
@@ -139,6 +140,11 @@ function run(style, opts) {
             opts.path.unshift(path.dirname(opts.source));
         }
 
+        if (once.indexOf(opts.source) > -1) {
+            return
+        } else {
+            once.push(opts.source)
+        }
         var content = read(opts.source, opts);
         run(content, opts);
 
