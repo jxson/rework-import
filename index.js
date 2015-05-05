@@ -112,12 +112,12 @@ function read(file, opts) {
  * @api private
  */
 
+var once = [];
 function run(style, opts) {
     opts = getOptions(style.rules, opts || {});
 
     var rules = style.rules || [];
     var ret = [];
-    var once = [];
 
     rules.forEach(function (rule) {
         if (rule.type !== 'import') {
