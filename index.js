@@ -112,6 +112,7 @@ function read(file, opts) {
  * @api private
  */
 
+var once = [];
 function run(style, opts) {
     opts = getOptions(style.rules, opts || {});
 
@@ -139,6 +140,11 @@ function run(style, opts) {
             opts.path.unshift(path.dirname(opts.source));
         }
 
+        if (once.indexOf(opts.source) > -1) {
+            return
+        } else {
+            once.push(opts.source)
+        }
         var content = read(opts.source, opts);
         run(content, opts);
 
