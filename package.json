@@ -28,6 +28,7 @@
     "css": "^2.0.0",
     "globby": "^2.0.0",
     "parse-import": "^2.0.0",
+    "sync-request": "^2.0.1",
     "url-regex": "^3.0.0"
   },
   "devDependencies": {
