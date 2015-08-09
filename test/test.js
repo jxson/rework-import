@@ -7,10 +7,30 @@ var test = require('ava');
 var importer = require('../');
 var fixture = path.join.bind(null, __dirname, 'fixtures');
 
+process.on('uncaughtException', function(err) {
+  console.error(err.stack);
+});
+
 var loadFixture = function(str) {
 	var file = read(fixture(str), 'utf8')
 	return file.trim().replace(/\r/g, "" )
 }
+
+
+test('import stylesheet including external stuff', function (t) {
+	var src = loadFixture('simple/index.css');
+	//This test is brittle since it fetches data from google.
+	var expected = loadFixture('simple/external.css');
+	var css = rework(src)
+		.use(importer({path: fixture('simple'), includeExternal : true }))
+		.toString();
+
+	console.log("Actual\n");
+	console.log(css);
+
+	t.assert(css === expected);
+	t.end();
+});
 
 test('import stylesheet', function (t) {
 	var src = loadFixture('simple/index.css');

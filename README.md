@@ -47,6 +47,13 @@ Type: `Function`
 
 A function to transform the content of imported files. Takes one argument and should return the modified content. Useful if you use [`css-whitespace`](https://github.com/reworkcss/css-whitespace).
 
+### includeExternal
+
+Type: `boolean`
+Default: `false`
+
+Use this to inline imports fetched via URLs.
+
 ## Example
 
 ```css

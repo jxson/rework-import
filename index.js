@@ -5,6 +5,7 @@ var css = require('css');
 var globby = require('globby');
 var parse = require('parse-import');
 var urlRegex = require('url-regex');
+var request = require('sync-request');
 
 /**
  * Get options
@@ -20,7 +21,8 @@ function getOptions(rules, opts) {
 		source: opts.source,
 		transform: opts.transform || function (val) {
 			return val;
-		}
+		},
+		includeExternal: opts.includeExternal || false	
 	};
 
 	obj.path = opts.path || [];
@@ -154,18 +156,31 @@ function run(style, opts) {
 			throw Error(createImportError(rule));
 		}
 
+		var content;
+		//Does this look like a url?
 		if (urlRegex({ exact: true }).test(data.path)) {
-			ret.push(rule);
-			return;
+			if (opts.includeExternal) {
+				var res = request('GET', data.path);
+				var urlData = opts.transform(res.getBody());
+				var datautf8 = urlData.toString("utf8");
+				content = css.parse(datautf8, {source: data.path})
+							.stylesheet;
+			} else {
+				//skip by default.
+				ret.push(rule);
+				return;
+			}
+		} else {
+			//It's a file. Load from the file...
+
+			opts.source = exists(data.path, pos, opts);
+
+			if (opts.path.indexOf(path.dirname(opts.source)) === -1) {
+				opts.path.unshift(path.dirname(opts.source));
+			}
+
+			content = read(opts.source, opts);
 		}
-
-		opts.source = exists(data.path, pos, opts);
-
-		if (opts.path.indexOf(path.dirname(opts.source)) === -1) {
-			opts.path.unshift(path.dirname(opts.source));
-		}
-
-		var content = read(opts.source, opts);
 		run(content, opts);
 
 		if (!data.condition || !data.condition.length) {
